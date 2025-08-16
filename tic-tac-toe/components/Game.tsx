@@ -1,4 +1,3 @@
-// components/Game.tsx
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -60,50 +59,62 @@ export default function Game() {
 
   return (
     <div className="w-full max-w-sm sm:max-w-md mx-auto">
-      <h1 className="text-2xl font-semibold text-center mb-4">Tic-Tac-Toe</h1>
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h1 className="text-2xl font-bold text-center mb-4 text-slate-800">Tic-Tac-Toe</h1>
 
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-lg" aria-live="polite">
-          {statusText}
-        </span>
-        <button
-          onClick={reset}
-          className="px-3 py-1.5 rounded bg-slate-800 text-white hover:bg-slate-700 active:scale-95 transition"
-        >
-          Reset
-        </button>
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-lg font-medium text-slate-700" aria-live="polite">
+            {statusText}
+          </span>
+          <button
+            onClick={reset}
+            className="px-3 py-1.5 rounded bg-slate-800 text-white hover:bg-slate-700 active:scale-95 transition"
+          >
+            Reset
+          </button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          {cells.map((value, idx) => {
+            const highlight =
+              result.status === 'won' && result.line?.includes(idx);
+            const disabled = Boolean(value) || result.status !== 'playing';
+
+            return (
+              <button
+                key={idx}
+                onClick={() => handleClick(idx)}
+                disabled={disabled}
+                aria-label={`Cell ${idx + 1}${value ? `, ${value}` : ''}`}
+                className={[
+                  'aspect-square rounded-lg border flex items-center justify-center',
+                  'text-4xl sm:text-5xl font-bold select-none transition-transform duration-150',
+                  highlight
+                    ? 'bg-yellow-100 border-yellow-400 animate-pulse'
+                    : 'bg-slate-50 border-slate-300 hover:scale-105 active:scale-95',
+                  disabled ? 'cursor-not-allowed opacity-100' : 'cursor-pointer',
+                ].join(' ')}
+              >
+                <span
+                  className={`transition-opacity duration-200 ${
+                    value === 'X'
+                      ? 'text-blue-600'
+                      : value === 'O'
+                      ? 'text-rose-600'
+                      : ''
+                  }`}
+                >
+                  {value}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="mt-4 text-center text-sm text-slate-500">
+          Two-player local game. Tap a cell to place your mark.
+        </p>
       </div>
-
-      <div className="grid grid-cols-3 gap-2">
-        {cells.map((value, idx) => {
-          const highlight =
-            result.status === 'won' && result.line?.includes(idx);
-          const disabled = Boolean(value) || result.status !== 'playing';
-
-          return (
-            <button
-              key={idx}
-              onClick={() => handleClick(idx)}
-              disabled={disabled}
-              aria-label={`Cell ${idx + 1}${value ? `, ${value}` : ''}`}
-              className={[
-                'aspect-square rounded-md border flex items-center justify-center',
-                'text-3xl sm:text-4xl font-bold select-none',
-                highlight
-                  ? 'bg-amber-200 border-amber-400'
-                  : 'bg-white border-slate-300 hover:bg-slate-50 active:bg-slate-100',
-                disabled ? 'cursor-not-allowed opacity-100' : 'cursor-pointer',
-              ].join(' ')}
-            >
-              {value}
-            </button>
-          );
-        })}
-      </div>
-
-      <p className="mt-3 text-center text-sm text-slate-500">
-        Two-player local game. Tap a cell to place your mark.
-      </p>
     </div>
   );
 }
