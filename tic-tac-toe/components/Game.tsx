@@ -17,10 +17,12 @@ const WIN_LINES: number[][] = [
   [2, 4, 6],
 ];
 
-function getWinner(cells: Cell[]) {
+function getWinner(cells: Cell[]): { winner: Player; line: number[] } | null {
   for (const [a, b, c] of WIN_LINES) {
     const v = cells[a];
-    if (v && v === cells[b] && v === cells[c]) return { winner: v as Player, line: [a, b, c] };
+    if (v && v === cells[b] && v === cells[c]) {
+      return { winner: v, line: [a, b, c] };
+    }
   }
   return null;
 }
@@ -30,15 +32,15 @@ export default function Game() {
   const [xIsNext, setXIsNext] = useState(true);
 
   const result = useMemo(() => {
-    const w = getWinner(cells);
-    if (w) return { status: 'won' as const, winner: w.winner, line: w.line };
+    const win = getWinner(cells);
+    if (win) return { status: 'won' as const, winner: win.winner, line: win.line };
     if (cells.every((c) => c)) return { status: 'draw' as const };
     return { status: 'playing' as const };
   }, [cells]);
 
   const handleClick = (idx: number) => {
     if (cells[idx] || result.status !== 'playing') return;
-    const next = cells.slice();
+    const next = [...cells];
     next[idx] = xIsNext ? 'X' : 'O';
     setCells(next);
     setXIsNext(!xIsNext);
@@ -53,7 +55,7 @@ export default function Game() {
     result.status === 'playing'
       ? `Turn: ${xIsNext ? 'X' : 'O'}`
       : result.status === 'won'
-      ? `Winner: ${(result as any).winner}`
+      ? `Winner: ${result.winner}`
       : 'Draw';
 
   return (
@@ -75,7 +77,7 @@ export default function Game() {
       <div className="grid grid-cols-3 gap-2">
         {cells.map((value, idx) => {
           const highlight =
-            result.status === 'won' && (result as any).line?.includes(idx);
+            result.status === 'won' && result.line?.includes(idx);
           const disabled = Boolean(value) || result.status !== 'playing';
 
           return (
